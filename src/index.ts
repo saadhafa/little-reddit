@@ -6,6 +6,7 @@ import mikroOrmConfig from './mikro-orm.config';
 import {ApolloServer} from 'apollo-server-express'
 import {buildSchema} from 'type-graphql'
 import { HelloResolver } from './resolvers/hello';
+import { UserResolver } from './resolvers/User';
 // import { Posts } from './entities/Posts';
 
 
@@ -22,7 +23,7 @@ const main = async () =>{
 
   const appoloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers:[HelloResolver,PostResolver],
+      resolvers:[HelloResolver,PostResolver,UserResolver],
       validate:false,
 
     }),
