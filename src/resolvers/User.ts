@@ -1,9 +1,12 @@
 
 
+
+
 import { MyContext } from "src/types";
-import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Resolver } from "type-graphql";
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import  { hash, verify } from 'argon2'
 import { User } from "../entities/User";
+
 
 
 @InputType()
@@ -31,6 +34,9 @@ class FieldError {
 }
 
 
+
+
+
 @ObjectType()
 class UserResponse{
 
@@ -45,18 +51,71 @@ class UserResponse{
 @Resolver()
 export class UserResolver{
 
+  @Query(()=> User,{nullable:true})
+  async me(
+    @Ctx() {em,req}:MyContext
+  ):Promise<User | null>{
 
-@Mutation(() => User)
-async register(@Arg('options') options:UserOptions, @Ctx() {em}:MyContext){
+    if(!req.session.userId){
+      return null
+    }
+
+
+    //TODO: return user response and handle error with try and catch
+
+
+    const user = await em.findOne(User,{id:req.session.userId})
+
+    return user
+  }
+
+
+
+
+@Mutation(() => UserResponse)
+async register(@Arg('options') options:UserOptions, @Ctx() {em}:MyContext):Promise<UserResponse>{
+
+  if(options.username.length <= 2 ){
+    return {
+      errors:[{
+        field:'username',
+        message:'invalid username'
+      }]
+    }
+  }
+  if(options.password.length <= 5 ){
+    return {
+      errors:[{
+        field:'password',
+        message:'invalid password to short'
+      }]
+    }
+  }
+
   const hashedPassword = await hash(options.password)
   const user = em.create(User,{username:options.username,password: hashedPassword})
-  await em.persistAndFlush(user)
-  return user
+
+  try{
+    await em.persistAndFlush(user)
+  }catch(err){
+    if(err.code === '23505'){
+      return {
+        errors:[{
+          field:"username",
+          message:"username already exist"
+        }]
+      }
+    }
+  }
+
+
+  
+  return {user}
 }
 
 
 @Mutation(() => UserResponse)
-async login(@Arg('options') options:UserOptions, @Ctx() {em}:MyContext) :Promise<UserResponse>{
+async login(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext) :Promise<UserResponse>{
   const user = await  em.findOne(User,{username:options.username.toLowerCase()})
 
   if(!user){
@@ -77,6 +136,8 @@ async login(@Arg('options') options:UserOptions, @Ctx() {em}:MyContext) :Promise
       }]
     }
   }
+
+  req.session.userId = user.id
 
   return {
     user
