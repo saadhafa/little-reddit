@@ -7,11 +7,10 @@ import {ApolloServer} from 'apollo-server-express'
 import {buildSchema} from 'type-graphql'
 import { HelloResolver } from './resolvers/hello';
 import { UserResolver } from './resolvers/User';
-// import { Posts } from './entities/Posts';
 import redis from 'redis'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
-import { MyContext } from './types';
+import cors from 'cors'
 
 
 const main = async () =>{
@@ -22,6 +21,11 @@ const main = async () =>{
   const app = express()
   const orm = await MikroORM.init(mikroOrmConfig)
   await orm.getMigrator().up();
+
+  app.use(cors({
+    origin:"http://localhost:3000",
+    credentials:true
+  }))
 
 
   app.use(
@@ -50,10 +54,10 @@ const main = async () =>{
       validate:false,
 
     }),
-    context: ({req,res}):MyContext => ({em:orm.em,req,res})
+    context: ({req,res}) => ({em:orm.em,req,res})
   })
 
-  appoloServer.applyMiddleware({app})
+  appoloServer.applyMiddleware({app,cors:false})
   
   app.listen(3333,() => {
     console.log('server on Port localhost:3333')
