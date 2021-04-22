@@ -1,7 +1,3 @@
-
-
-
-
 import { MyContext } from "src/types";
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import  { hash, verify } from 'argon2'
@@ -73,7 +69,7 @@ export class UserResolver{
 
 
 @Mutation(() => UserResponse)
-async register(@Arg('options') options:UserOptions, @Ctx() {em}:MyContext):Promise<UserResponse>{
+async register(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext):Promise<UserResponse>{
 
   if(options.username.length <= 2 ){
     return {
@@ -107,6 +103,9 @@ async register(@Arg('options') options:UserOptions, @Ctx() {em}:MyContext):Promi
       }
     }
   }
+
+
+  req.session.userId = user.id
 
 
   

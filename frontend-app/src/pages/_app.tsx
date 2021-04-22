@@ -6,7 +6,8 @@ import { createClient, Provider } from 'urql';
 
 
 
-function MyApp({ Component, pageProps }) {
+
+function MyApp({ Component, pageProps }:any){
   const client = createClient({
     url: 'http://localhost:3333/graphql',
     fetchOptions:{
