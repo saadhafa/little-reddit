@@ -4,7 +4,6 @@ import {Field, Form, Formik} from 'formik'
 import { Button } from '@chakra-ui/react';
 import Wrapper from '../components/wrapper';
 import InputField from '../components/InputFiled';
-import { useMutation } from 'urql';
 import { useRegisterMutation } from '../generated/graphql';
 import { errorMap } from '../util/errorMap';
 
