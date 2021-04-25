@@ -6,6 +6,7 @@ import Wrapper from '../components/wrapper';
 import InputField from '../components/InputFiled';
 import { useRegisterMutation } from '../generated/graphql';
 import { errorMap } from '../util/errorMap';
+import {useRouter} from 'next/router';
 
 interface RegisterProps {
 
@@ -17,6 +18,7 @@ interface RegisterProps {
 
  const Register:React.FC<RegisterProps> = ()=> {
    const [,register] = useRegisterMutation()
+    const router = useRouter()
   return(
 
 
@@ -25,7 +27,15 @@ interface RegisterProps {
 
       const response = await register(values)
       if(response.data?.register.errors){
+        console.log(response)
         setErrors(errorMap(response.data?.register.errors))
+
+      }else if(response.data?.register.user){
+        console.log(response)
+        // if user exists 
+        console.log('worked ')
+        router.push('/')
+        //router.push('/')
       }
 
   } }>
