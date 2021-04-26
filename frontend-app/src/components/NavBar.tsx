@@ -23,10 +23,9 @@ let body = null
      //TODO:  put loadder here    
     }
 else if (!data?.me){
-    console.log(data)
     body =  (
         <>
-<NextLink href="/login">∏
+<NextLink href="/login">
         <Link ml={4} color="white">Login</Link>
         </NextLink>
         <NextLink href="/register">

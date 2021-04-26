@@ -3,13 +3,23 @@ import { ChakraProvider, ColorModeProvider } from '@chakra-ui/react'
 import theme from '../theme'
 
 import { createClient, dedupExchange, fetchExchange, Provider } from 'urql';
-import { cacheExchange, QueryInput,Cache } from '@urql/exchange-graphcache';
-import { LoginMutation, MeDocument, MeQuery } from '../generated/graphql';
+import { cacheExchange, QueryInput,Cache, query } from '@urql/exchange-graphcache';
+import { LoginMutation, MeDocument, MeQuery, RegisterMutation } from '../generated/graphql';
 
 
-function typedUpdatedQuery<Result,Query>(Cache:Cache,qi:QueryInput,result:any,fn:(R:Result,q:Query) => Query){
-  return Cache.updateQuery(qi,data => fn(result,data as any) as any)
+function typedUpdatedQuery<Result,Query>(
+
+  cache:Cache,
+  qi:QueryInput,
+  result:any,
+  fn:(r:Result,q:Query) => Query
+
+  )
+  
+{
+  return cache.updateQuery(qi,data => fn(result,data as any) as any)
 }
+
 
 
 function MyApp({ Component, pageProps }:any){
@@ -21,17 +31,34 @@ function MyApp({ Component, pageProps }:any){
     exchanges: [dedupExchange, cacheExchange({
       updates:{
         Mutation:{
-          login:(result:LoginMutation,args,cache,info) => {
-            typedUpdatedQuery<LoginMutation,MeQuery>(cache,{query:MeDocument},result,(result,query) =>{
-              if(result.login.user){
-                return query
-              }else{
-                return {
-                  me:result.login.user
-                }
-              }
-            })
-          }
+          login:(_result,args,cache,info) =>{
+            typedUpdatedQuery<LoginMutation,MeQuery>(cache,
+              {query:MeDocument},
+                _result,
+                (result,query) =>{
+                  if(result.login.errors){
+                    return query
+                  }else{
+                    return{
+                      me: result.login.user
+                    }
+                  }
+                })
+          },
+          register:(_result,args,cache,info) =>{
+            typedUpdatedQuery<RegisterMutation,MeQuery>(cache,
+              {query:MeDocument},
+                _result,
+                (result,query) =>{
+                  if(result.register.errors){
+                    return query
+                  }else{
+                    return{
+                      me: result.register.user
+                    }
+                  }
+                })
+          } 
         }
       }
     }), fetchExchange],

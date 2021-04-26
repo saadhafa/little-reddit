@@ -95,6 +95,11 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export type UserFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'username'>
+);
+
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -107,7 +112,7 @@ export type LoginMutation = (
     { __typename?: 'UserResponse' }
     & { user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'username'>
+      & UserFragment
     )>, errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
       & Pick<FieldError, 'field' | 'message'>
@@ -130,7 +135,7 @@ export type RegisterMutation = (
       & Pick<FieldError, 'field' | 'message'>
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'username'>
+      & UserFragment
     )> }
   ) }
 );
@@ -142,16 +147,20 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me?: Maybe<(
     { __typename?: 'User' }
-    & Pick<User, 'username'>
+    & UserFragment
   )> }
 );
 
-
+export const UserFragmentDoc = gql`
+    fragment user on User {
+  username
+}
+    `;
 export const LoginDocument = gql`
     mutation login($username: String!, $password: String!) {
   login(options: {username: $username, password: $password}) {
     user {
-      username
+      ...user
     }
     errors {
       field
@@ -159,7 +168,7 @@ export const LoginDocument = gql`
     }
   }
 }
-    `;
+    ${UserFragmentDoc}`;
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
@@ -172,11 +181,11 @@ export const RegisterDocument = gql`
       message
     }
     user {
-      username
+      ...user
     }
   }
 }
-    `;
+    ${UserFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
@@ -184,10 +193,10 @@ export function useRegisterMutation() {
 export const MeDocument = gql`
     query Me {
   me {
-    username
+    ...user
   }
 }
-    `;
+    ${UserFragmentDoc}`;
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
