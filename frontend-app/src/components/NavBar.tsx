@@ -3,7 +3,7 @@ import { Link } from '@chakra-ui/react'
 import React from 'react'
 
 import  NextLink from 'next/link'
-import { useMeQuery } from '../generated/graphql'
+import { useLogoutMutation, useMeQuery } from '../generated/graphql'
 
 
 
@@ -16,6 +16,7 @@ import { useMeQuery } from '../generated/graphql'
 
 const NavBar:React.FC = () => {
 const [{data,fetching}] = useMeQuery()
+const [{fetching:logoutFetching},logout] = useLogoutMutation()
 
 let body = null 
     if(fetching){
@@ -37,8 +38,10 @@ else if (!data?.me){
     body = (
         <Flex alignItems="center">
               <Text ml={4} color="white">{data.me.username}</Text>
-              <Link ml={5} color="white">Logout</Link>
-        </Flex>
+              <Link isLoadding={logoutFetching} onClick={() => {
+                  logout()
+              }} ml={5} color="white">Logout</Link>
+        </Flex> 
     )
 }
 

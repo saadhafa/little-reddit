@@ -4,7 +4,7 @@ import theme from '../theme'
 
 import { createClient, dedupExchange, fetchExchange, Provider } from 'urql';
 import { cacheExchange, QueryInput,Cache, query } from '@urql/exchange-graphcache';
-import { LoginMutation, MeDocument, MeQuery, RegisterMutation } from '../generated/graphql';
+import { LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation } from '../generated/graphql';
 
 
 function typedUpdatedQuery<Result,Query>(
@@ -31,6 +31,9 @@ function MyApp({ Component, pageProps }:any){
     exchanges: [dedupExchange, cacheExchange({
       updates:{
         Mutation:{
+          logout:(_result,args,cache,info) =>{
+            typedUpdatedQuery<LogoutMutation, MeQuery>(cache,{query:MeDocument},_result,() => ({me:null}))
+          },
           login:(_result,args,cache,info) =>{
             typedUpdatedQuery<LoginMutation,MeQuery>(cache,
               {query:MeDocument},
