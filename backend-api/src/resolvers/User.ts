@@ -47,6 +47,17 @@ class UserResponse{
 @Resolver()
 export class UserResolver{
 
+
+  @Mutation(() => Boolean)
+  forgotPassword(
+
+  ){
+
+    return true
+  }
+
+
+
   @Query(()=> User,{nullable:true})
   async me(
     @Ctx() {em,req}:MyContext

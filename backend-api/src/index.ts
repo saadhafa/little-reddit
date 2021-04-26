@@ -15,7 +15,6 @@ import cors from 'cors'
 
 
 const main = async () =>{
-
   const RedisStore = connectRedis(session)
   const redisClient = redis.createClient()
 
