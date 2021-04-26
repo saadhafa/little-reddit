@@ -11,7 +11,7 @@ import redis from 'redis'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
-import { Posts } from './entities/Posts';
+// import { Posts } from './entities/Posts';
 
 
 const main = async () =>{
