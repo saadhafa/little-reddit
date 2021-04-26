@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "whatch": "tsc -w",
-    "start": "nodemon dist/index.js",
+    "dev": "nodemon dist/index.js",
     "start2": "ts-node src/index.ts",
     "migration:create": "npx mikro-orm migration:create"
   },
