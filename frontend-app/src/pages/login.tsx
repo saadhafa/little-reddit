@@ -7,6 +7,8 @@ import InputField from '../components/InputFiled';
 import { useLoginMutation } from '../generated/graphql';
 import { errorMap } from '../util/errorMap';
 import {useRouter} from 'next/router';
+import { withUrqlClient } from 'next-urql';
+import { CreateUrqlClient } from '../util/createUrqlClient';
 
 
 
@@ -56,4 +58,4 @@ import {useRouter} from 'next/router';
   )
 }
 
-export default Login
+export default withUrqlClient(CreateUrqlClient)(Login)

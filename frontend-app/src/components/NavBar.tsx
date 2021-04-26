@@ -4,18 +4,16 @@ import React from 'react'
 
 import  NextLink from 'next/link'
 import { useLogoutMutation, useMeQuery } from '../generated/graphql'
-
-
-
-
-
-
-
+import { isServer } from '../util/isServer'
 
 
 
 const NavBar:React.FC = () => {
-const [{data,fetching}] = useMeQuery()
+const [{data,fetching}] = useMeQuery(
+    {
+        pause:isServer()
+    
+    })
 const [{fetching:logoutFetching},logout] = useLogoutMutation()
 
 let body = null 
@@ -49,7 +47,7 @@ else if (!data?.me){
     return(
     <Flex bg="tomato">
         <Box p={4}>
-       {body}
+        {body}
         </Box>
     </Flex>
     )

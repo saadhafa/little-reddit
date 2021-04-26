@@ -7,6 +7,8 @@ import InputField from '../components/InputFiled';
 import { useRegisterMutation } from '../generated/graphql';
 import { errorMap } from '../util/errorMap';
 import {useRouter} from 'next/router';
+import { CreateUrqlClient } from '../util/createUrqlClient';
+import { withUrqlClient } from 'next-urql';
 
 interface RegisterProps {
 
@@ -63,4 +65,4 @@ interface RegisterProps {
   )
 }
 
-export default Register
+export default withUrqlClient(CreateUrqlClient)(Register)
