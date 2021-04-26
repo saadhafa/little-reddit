@@ -11,6 +11,7 @@ import redis from 'redis'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
+import { Posts } from './entities/Posts';
 
 
 const main = async () =>{
@@ -21,6 +22,7 @@ const main = async () =>{
   const app = express()
   const orm = await MikroORM.init(mikroOrmConfig)
   await orm.getMigrator().up();
+
 
   app.use(cors({
     origin:"http://localhost:3000",
