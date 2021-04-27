@@ -1,21 +1,10 @@
 import { MyContext } from "src/types";
-import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import  { hash, verify } from 'argon2'
 import { User } from "../entities/User";
+import { UserOptions } from "./UserOptions";
+import { validateRegister } from '../util/validateRegister'
 
-
-
-@InputType()
-class UserOptions{
-
-  @Field()
-  username:string;
-
-  @Field()
-  password:string;
-
-
-}
 
 
 @ObjectType()
@@ -51,7 +40,8 @@ export class UserResolver{
   @Mutation(() => Boolean)
   forgotPassword(
 
-  ){
+  )
+  {
 
     return true
   }
@@ -82,30 +72,21 @@ export class UserResolver{
 @Mutation(() => UserResponse)
 async register(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext):Promise<UserResponse>{
 
-  if(options.username.length <= 2 ){
-    return {
-      errors:[{
-        field:'username',
-        message:'invalid username'
-      }]
-    }
-  }
-  if(options.password.length <= 5 ){
-    return {
-      errors:[{
-        field:'password',
-        message:'invalid password to short'
-      }]
-    }
+  const errors = validateRegister(options)
+
+  if(errors){
+    console.log("error")
+    return {errors}
   }
 
   const hashedPassword = await hash(options.password)
-  const user = em.create(User,{username:options.username,password: hashedPassword})
+  const user = em.create(User,{username:options.username,password: hashedPassword,email:options.email})
 
   try{
     await em.persistAndFlush(user)
   }catch(err){
     if(err.code === '23505'){
+      console.log(err)
       return {
         errors:[{
           field:"username",
@@ -125,8 +106,8 @@ async register(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext):P
 
 
 @Mutation(() => UserResponse)
-async login(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext) :Promise<UserResponse>{
-  const user = await  em.findOne(User,{username:options.username.toLowerCase()})
+async login(@Arg('usernameOrEmail') usernameOrEmail:string,@Arg('password') password:string , @Ctx() {em,req}:MyContext) :Promise<UserResponse>{
+  const user = await  em.findOne(User, usernameOrEmail.includes('@') ? {email:usernameOrEmail.toLowerCase()} : {username:usernameOrEmail.toLowerCase()} )
 
   if(!user){
     return {
@@ -137,8 +118,8 @@ async login(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext) :Pro
     }
   }
 
-  const password = await verify(user.password,options.password)
-  if(!password){
+  const passwordHashed = await verify(user.password,password)
+  if(!passwordHashed){
     return {
       errors:[{
         field:'password',

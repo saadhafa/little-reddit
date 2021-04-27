@@ -21,7 +21,7 @@ import { CreateUrqlClient } from '../util/createUrqlClient';
 
 
     <Wrapper variant="small">
-  <Formik initialValues={{username: "",password: ""}} onSubmit={async (values,{setErrors}) => {
+  <Formik initialValues={{usernameOrEmail: "",password: ""}} onSubmit={async (values,{setErrors}) => {
 
       const response = await login(values)
       if(response.data?.login.errors){
@@ -39,7 +39,7 @@ import { CreateUrqlClient } from '../util/createUrqlClient';
       {({values,handleChange}) => (
 
         <Form>
-          <InputField name="username" label="username" placeholder="username"  />
+          <InputField name="usernameOrEmail" label="username or email" placeholder="username or email"  />
           <InputField name="password" label="password" placeholder="password" type="password"  />
           <Button mt={5} type="submit" colorScheme="teal">Login</Button>
         </Form>
