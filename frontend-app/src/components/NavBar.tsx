@@ -14,14 +14,11 @@ const [{data,fetching}] = useMeQuery(
         pause:isServer()
     
     })
-const [{fetching:logoutFetching},logout] = useLogoutMutation()
+const [,logout] = useLogoutMutation()
 
 let body = null 
-    if(fetching){
 
-     //TODO:  put loadder here    
-    }
-else if (!data?.me){
+ if (!data?.me){
     body =  (
         <>
 <NextLink href="/login">
@@ -36,7 +33,7 @@ else if (!data?.me){
     body = (
         <Flex alignItems="center">
               <Text ml={4} color="white">{data.me.username}</Text>
-              <Link isLoadding={logoutFetching} onClick={() => {
+              <Link  onClick={() => {
                   logout()
               }} ml={5} color="white">Logout</Link>
         </Flex> 

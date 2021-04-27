@@ -6,6 +6,7 @@ import { UserOptions } from "./UserOptions";
 import { validateRegister } from '../util/validateRegister'
 import {v4 as uuid} from 'uuid'
 import { sendEmail } from "../util/sendEmail";
+import { RESET_PASSWORD_PREFIX } from "../constants";
 
 
 
@@ -38,6 +39,53 @@ class UserResponse{
 @Resolver()
 export class UserResolver{
 
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg('token') token:string,@Arg('newPassword') newPassword:string, @Ctx() {em,redis}:MyContext
+  ):Promise<UserResponse>{
+
+    if(newPassword.length <= 5){
+      return {
+        errors: [{
+          field:'newPassword',
+          message:"invalid Password"
+          
+        }]
+      }
+    }
+
+    const key = RESET_PASSWORD_PREFIX + token
+    const userId = await redis.get(key)
+
+    if(!userId){
+      return {
+        errors:[{
+          field:"token",
+          message:"Expired token"
+        }]
+      }
+    }
+
+    const user = await em.findOne(User,{id: parseInt(userId)})
+
+    if(!user){
+      return {
+        errors:[{
+          field:"token",
+          message:"User does not exist"
+        }]
+      }
+    }
+
+
+    user.password = await hash(newPassword)
+    await em.persistAndFlush(user)
+    await redis.del(key)
+
+    return {user}
+
+  }
+
 
   @Mutation(() => Boolean)
   async forgotPassword(
@@ -52,7 +100,7 @@ export class UserResolver{
     }
 
     const token = uuid();
-    await redis.set("reset-password:" + token ,user.id, 'ex',1000 * 60 * 60)
+    await redis.set(RESET_PASSWORD_PREFIX + token ,user.id, 'ex',1000 * 60 * 60)
     // one hour
     await sendEmail(email,
       `<a href="http://localhost:3000/reset-password/${token}">Reset Password</a>`
