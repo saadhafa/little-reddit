@@ -4,6 +4,8 @@ import  { hash, verify } from 'argon2'
 import { User } from "../entities/User";
 import { UserOptions } from "./UserOptions";
 import { validateRegister } from '../util/validateRegister'
+import {v4 as uuid} from 'uuid'
+import { sendEmail } from "../util/sendEmail";
 
 
 
@@ -38,12 +40,24 @@ export class UserResolver{
 
 
   @Mutation(() => Boolean)
-  forgotPassword(
-
+  async forgotPassword(
+    @Arg('email') email:string,
+    @Ctx() {em,redis}:MyContext
   )
   {
+    const user = await em.findOne(User,{email})
 
-    return true
+    if (!user){
+      return true
+    }
+
+    const token = uuid();
+    await redis.set("reset-password:" + token ,user.id, 'ex',1000 * 60 * 60)
+    // one hour
+    await sendEmail(email,
+      `<a href="http://localhost:3000/reset-password/${token}">Reset Password</a>`
+      )
+      return true
   }
 
 
@@ -75,7 +89,6 @@ async register(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext):P
   const errors = validateRegister(options)
 
   if(errors){
-    console.log("error")
     return {errors}
   }
 
@@ -112,8 +125,8 @@ async login(@Arg('usernameOrEmail') usernameOrEmail:string,@Arg('password') pass
   if(!user){
     return {
       errors:[{
-        field:'username',
-        message:'invalid username'
+        field:'usernameOrEmail',
+        message:'Invalid username or password'
       }]
     }
   }
