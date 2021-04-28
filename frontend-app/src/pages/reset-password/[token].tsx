@@ -32,7 +32,7 @@ const ResetPassword:NextPage<{token:string}> = ({token}) => {
         tokenErr ?  
             <Alert status="error">
                 <AlertIcon />
-                tokenErr
+                {tokenErr}
             </Alert> 
         
             : null
@@ -46,10 +46,9 @@ const ResetPassword:NextPage<{token:string}> = ({token}) => {
             if(response.data?.changePassword.errors){
                 const errMap = errorMap(response.data?.changePassword.errors)
                 if('token' in errMap){
-                    console.log(errMap)
+                    setTokenErr(errMap.token)
                 }
                 setErrors(errMap)
-                return
             }
             if(response.data?.changePassword.user){
                 router.push('/login')
@@ -60,7 +59,7 @@ const ResetPassword:NextPage<{token:string}> = ({token}) => {
       
               <Form>
                 <InputField name="newPassword" type="password" label="new password" placeholder="new password"  />
-                <Button isLoading={isSubmitting}  mt={5} type="submit" colorScheme="teal">Change password</Button>
+                <Button isLoading={isSubmitting}  mt={5} type="button" colorScheme="teal">Change password</Button>
               </Form>
       
             )}

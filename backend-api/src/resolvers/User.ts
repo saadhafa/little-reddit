@@ -61,7 +61,7 @@ export class UserResolver{
       return {
         errors:[{
           field:"token",
-          message:"Expired token"
+          message:"Expired Session"
         }]
       }
     }
