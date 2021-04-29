@@ -1,8 +1,6 @@
 import { PostResolver } from './resolvers/post';
 import { __PROD__ } from './constants';
-import { MikroORM } from '@mikro-orm/core'
 import express from 'express'
-import mikroOrmConfig from './mikro-orm.config';
 import {ApolloServer} from 'apollo-server-express'
 import {buildSchema} from 'type-graphql'
 import { HelloResolver } from './resolvers/hello';
@@ -11,7 +9,9 @@ import Redis from 'ioredis'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
-// import { Posts } from './entities/Posts';
+import {createConnection} from 'typeorm'
+import { User } from './entities/User';
+import { Posts } from './entities/Posts';
 
 
 const main = async () =>{
@@ -19,8 +19,19 @@ const main = async () =>{
   const redisClient = new Redis()
 
   const app = express()
-  const orm = await MikroORM.init(mikroOrmConfig)
-  await orm.getMigrator().up();
+
+
+  const connect = await createConnection({
+    type:'postgres',
+    database:'reddit2',
+    username:'mac',
+    password:'root',
+    synchronize:true,
+    logging:true,
+    entities:[User,Posts]
+  })
+
+
 
 
   app.use(cors({
@@ -55,7 +66,7 @@ const main = async () =>{
       validate:false,
 
     }),
-    context: ({req,res}) => ({em:orm.em,req,res,redis:redisClient})
+    context: ({req,res}) => ({req,res,redis:redisClient})
   })
 
   appoloServer.applyMiddleware({app,cors:false})
