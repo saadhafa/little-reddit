@@ -7,6 +7,7 @@ import { validateRegister } from '../util/validateRegister'
 import {v4 as uuid} from 'uuid'
 import { sendEmail } from "../util/sendEmail";
 import { RESET_PASSWORD_PREFIX } from "../constants";
+import {getConnection} from 'typeorm'
 
 
 
@@ -41,7 +42,7 @@ export class UserResolver{
 
   @Mutation(() => UserResponse)
   async changePassword(
-    @Arg('token') token:string,@Arg('newPassword') newPassword:string, @Ctx() {em,redis}:MyContext
+    @Arg('token') token:string,@Arg('newPassword') newPassword:string, @Ctx() {redis}:MyContext
   ):Promise<UserResponse>{
 
     if(newPassword.length <= 5){
@@ -66,7 +67,8 @@ export class UserResolver{
       }
     }
 
-    const user = await em.findOne(User,{id: parseInt(userId)})
+    const userIdArg = parseInt(userId)
+    const user = await User.findOne(userIdArg)
 
     if(!user){
       return {
@@ -78,8 +80,8 @@ export class UserResolver{
     }
 
 
-    user.password = await hash(newPassword)
-    await em.persistAndFlush(user)
+    await User.update({id: userIdArg},{password:await hash(newPassword)})
+    
     await redis.del(key)
 
     return {user}
@@ -90,10 +92,10 @@ export class UserResolver{
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg('email') email:string,
-    @Ctx() {em,redis}:MyContext
+    @Ctx() {redis}:MyContext
   )
   {
-    const user = await em.findOne(User,{email})
+    const user = await User.findOne({where:{email}})
 
     if (!user){
       return true
@@ -112,8 +114,8 @@ export class UserResolver{
 
   @Query(()=> User,{nullable:true})
   async me(
-    @Ctx() {em,req}:MyContext
-  ):Promise<User | null>{
+    @Ctx() {req}:MyContext
+  ){
 
     if(!req.session.userId){
       return null
@@ -123,31 +125,39 @@ export class UserResolver{
     //TODO: return user response and handle error with try and catch
 
 
-    const user = await em.findOne(User,{id:req.session.userId})
+   return await User.findOne(req.session.userId)
 
-    return user
+
   }
 
 
 
 
 @Mutation(() => UserResponse)
-async register(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext):Promise<UserResponse>{
+async register(@Arg('options') options:UserOptions, @Ctx() {req}:MyContext):Promise<UserResponse>{
 
   const errors = validateRegister(options)
 
   if(errors){
     return {errors}
   }
-
+  
   const hashedPassword = await hash(options.password)
-  const user = em.create(User,{username:options.username,password: hashedPassword,email:options.email})
+  let user;
 
   try{
-    await em.persistAndFlush(user)
-  }catch(err){
+    const result = await getConnection().createQueryBuilder().insert().into(User).values({
+      username:options.username,
+      password:hashedPassword,
+      email:options.email
+    }).returning('*')
+    .execute();
+
+    user  = result.raw[0]
+  }
+
+ catch(err){
     if(err.code === '23505'){
-      console.log(err)
       return {
         errors:[{
           field:"username",
@@ -167,9 +177,8 @@ async register(@Arg('options') options:UserOptions, @Ctx() {em,req}:MyContext):P
 
 
 @Mutation(() => UserResponse)
-async login(@Arg('usernameOrEmail') usernameOrEmail:string,@Arg('password') password:string , @Ctx() {em,req}:MyContext) :Promise<UserResponse>{
-  const user = await  em.findOne(User, usernameOrEmail.includes('@') ? {email:usernameOrEmail.toLowerCase()} : {username:usernameOrEmail.toLowerCase()} )
-
+async login(@Arg('usernameOrEmail') usernameOrEmail:string,@Arg('password') password:string , @Ctx() {req}:MyContext) :Promise<UserResponse>{
+  const user = await  User.findOne(usernameOrEmail.includes('@') ? {where:{email:usernameOrEmail.toLowerCase()}} : {where:{username:usernameOrEmail.toLowerCase()}})
   if(!user){
     return {
       errors:[{
