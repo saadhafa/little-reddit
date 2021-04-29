@@ -154,12 +154,10 @@ async register(@Arg('options') options:UserOptions, @Ctx() {req}:MyContext):Prom
     .execute();
 
     user  = result.raw[0]
-  console.log(result)
   }
 
  catch(err){
     if(err.code === '23505'){
-      console.log(err)
       return {
         errors:[{
           field:"username",

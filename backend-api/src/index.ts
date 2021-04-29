@@ -10,7 +10,7 @@ import session from 'express-session'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
 import {createConnection} from 'typeorm'
-import { User } from './entities/User';
+import typeOrmConfig from './typeorm.config'
 import { Posts } from './entities/Posts';
 
 
@@ -19,17 +19,7 @@ const main = async () =>{
   const redisClient = new Redis()
 
   const app = express()
-
-
-  const connect = await createConnection({
-    type:'postgres',
-    database:'reddit2',
-    username:'mac',
-    password:'root',
-    synchronize:true,
-    logging:true,
-    entities:[User,Posts]
-  })
+  await createConnection(typeOrmConfig)
 
 
 
