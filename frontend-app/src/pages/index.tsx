@@ -8,7 +8,11 @@ import { CreateUrqlClient } from "../util/createUrqlClient"
  
  
  const Index = () => {
-     const [{data}] = usePostsQuery()
+     const [{data}] = usePostsQuery({
+         variables:{
+             limit:10 as never
+         }
+     })
     return (
         <Layout>
 
