@@ -11,7 +11,6 @@ import connectRedis from 'connect-redis'
 import cors from 'cors'
 import {createConnection} from 'typeorm'
 import typeOrmConfig from './typeorm.config'
-import { Posts } from './entities/Posts';
 
 
 const main = async () =>{
