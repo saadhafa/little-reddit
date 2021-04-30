@@ -1,9 +1,10 @@
 import { Box } from '@chakra-ui/layout'
 import React from 'react'
+import { variant } from '../util/typeVariant'
 
 interface WrapperProps {
 
-  variant?: 'small' | 'regular'
+  variant?: variant
 
 }
 

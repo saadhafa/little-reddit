@@ -31,19 +31,22 @@ let body = null
     )   
 }else{
     body = (
-        <Flex alignItems="center">
-              <Text ml={4} color="white">{data.me.username}</Text>
+        <Box>
+              <Text  display="inline" ml={4} fontWeight="bolder" color="black">{data.me.username}</Text>
+              <NextLink href="/create-post">
+                    <Link ml={4} color="white">Create Post</Link>
+            </NextLink>
               <Link  onClick={() => {
                   logout()
               }} ml={5} color="white">Logout</Link>
-        </Flex> 
+        </Box> 
     )
 }
 
 
     return(
-    <Flex bg="tomato">
-        <Box p={4}>
+    <Flex bg="tomato" justifyContent="flex-end">
+        <Box p={4} >
         {body}
         </Box>
     </Flex>
