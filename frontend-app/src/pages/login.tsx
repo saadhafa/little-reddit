@@ -31,19 +31,22 @@ import NextLink from 'next/link';
         setErrors(errorMap(response.data?.login.errors))
 
       }else if(response.data?.login.user){
-        // if user exists 
-        router.push('/')
+        if(typeof router.query.next === 'string'){
+          router.push(router.query.next)
+        }else{
+          router.push('/')
+        }
       }
 
   } }>
 
 
-      {({values,handleChange}) => (
+      {({isSubmitting}) => (
 
         <Form>
           <InputField name="usernameOrEmail" label="username or email" placeholder="username or email"  />
           <InputField name="password" label="password" placeholder="password" type="password"  />
-          <Button mb={4} mt={5} type="submit" colorScheme="teal">Login</Button>
+          <Button isLoading={isSubmitting} mb={4} mt={5} type="submit" colorScheme="teal">Login</Button>
         </Form>
 
       )}
