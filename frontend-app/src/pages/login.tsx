@@ -31,8 +31,11 @@ import NextLink from 'next/link';
         setErrors(errorMap(response.data?.login.errors))
 
       }else if(response.data?.login.user){
-        // if user exists 
-        router.push('/')
+        if(typeof router.query.next === 'string'){
+          router.push(router.query.next)
+        }else{
+          router.push('/')
+        }
       }
 
   } }>
