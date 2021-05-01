@@ -13,11 +13,11 @@ interface Props {
     variant?: variant
 }
 
-const Layout:React.FC<Props> = ({children}) => {
+const Layout:React.FC<Props> = ({children,variant}) => {
 
     return <>
         <NavBar/>
-    <Wrapper variant="small">
+    <Wrapper variant={variant}>
 
         {[children]}
     </Wrapper>

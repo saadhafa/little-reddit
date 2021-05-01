@@ -3,6 +3,8 @@ import Layout from "../components/layout"
 import NavBar from "../components/NavBar"
 import { usePostsQuery } from "../generated/graphql"
 import { CreateUrqlClient } from "../util/createUrqlClient"
+import {Stack,Box,Text,Heading} from '@chakra-ui/react'
+
 
  
  
@@ -14,10 +16,19 @@ import { CreateUrqlClient } from "../util/createUrqlClient"
          }
      })
     return (
-        <Layout>
+        <Layout variant="regular">
+        
+        
+        <Heading p="10">LittleReddit</Heading>
 
-        <div>all Posts</div>
-        {!data ? null : data.posts.map((post) => <div key={post.id}>{post.title}</div>)}
+        <Stack>
+        {!data ? null : data.posts.map((p) => (
+                <Box key={p.id} p={5} shadow="md" borderWidth="1px">
+                <Heading fontSize="xl">{p.title}</Heading>
+                <Text mt={4}>{p.textSnipped}</Text>
+              </Box>
+        ))}
+        </Stack>
         </Layout>
     )
 

@@ -45,7 +45,7 @@ let body = null
 
 
     return(
-    <Flex bg="tomato" justifyContent="flex-end">
+    <Flex position='sticky' zIndex={3} top="0" bg="tomato" justifyContent="flex-end">
         <Box p={4} >
         {body}
         </Box>
