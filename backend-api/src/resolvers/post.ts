@@ -1,5 +1,5 @@
 import { Posts } from '../entities/Posts';
-import { Arg, Ctx, Field, FieldResolver, InputType, Int, Mutation, Query, Resolver,Root,UseMiddleware } from "type-graphql";
+import { Arg, Ctx, Field, FieldResolver, InputType, Int, Mutation, Query, Resolver,Root,UseMiddleware,ObjectType } from "type-graphql";
 import { MyContext } from 'src/types';
 import { isAuth } from '../middleware/Auth';
 import {getConnection} from 'typeorm'
@@ -21,6 +21,18 @@ class PostInput {
 }
 
 
+@ObjectType()
+class PaginatedPosts{
+
+  @Field(()=>[Posts])
+  Posts:Posts[]
+
+  @Field()
+  hasMore:boolean
+
+}
+
+
 @Resolver(Posts)
 export class PostResolver{
 
@@ -32,15 +44,16 @@ export class PostResolver{
     return root.text.slice(0,50)
   }
 
-  @Query(() => [Posts])
+
+  @Query(() => PaginatedPosts)
   async posts(
 
     @Arg('limit', () => Int) limit:number,
     @Arg('cursor', () => String, {nullable:true}) cursor:string | null,
 
-  ): Promise<Posts[]>{
+  ): Promise<PaginatedPosts>{
 
-    const maxLimit = Math.min(50,limit) 
+    const maxLimit = Math.min(50,limit) + 1
 
     const query =  getConnection().getRepository(Posts)
     .createQueryBuilder("p")
@@ -53,7 +66,9 @@ export class PostResolver{
        query.where('"createdAt" < :cursor', { cursor: parsedCursor })
     }
     
-      return await query.getMany()
+      const posts =  await query.getMany()
+
+      return {Posts:posts.slice(0,maxLimit -1 ),hasMore: posts.length === maxLimit}
 
   }
 

@@ -33,5 +33,5 @@
   "include": [
     "./src/**/*.tsx",
     "./src/**/*.ts"
-  ]
+, "../1619990905653-NewMockPosts.ts"  ]
 }

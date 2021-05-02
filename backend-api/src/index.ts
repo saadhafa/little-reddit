@@ -12,6 +12,7 @@ import cors from 'cors'
 import {createConnection} from 'typeorm'
 import typeOrmConfig from './typeorm.config'
 
+
 const main = async () =>{
   const RedisStore = connectRedis(session)
   const redisClient = new Redis()
@@ -21,7 +22,6 @@ const main = async () =>{
   const app = express()
   const con = await createConnection(typeOrmConfig)
   await con.runMigrations()
-
 
 
 
