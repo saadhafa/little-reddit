@@ -13,10 +13,8 @@ import React, { useState } from "react"
  const Index = () => {
      const [variables,setVariables] = useState({limit:10, cursor:null as null | string })
      const [{data,fetching}] = usePostsQuery({
-         variables,
+        variables,
      })
-     console.log(data)
-     console.log(variables)
 
      if (!data && !fetching){
          return <Heading>Not able to get data from the Server</Heading> 
@@ -30,7 +28,7 @@ import React, { useState } from "react"
         <Heading p="10">LittleReddit</Heading>
 
         <Stack>
-        {!data ? null : data.posts.map((p) => (
+        {!data ? null : data.posts.Posts.map((p) => (
                 <Box key={p.id} p={5} shadow="md" borderWidth="1px">
                 <Heading fontSize="xl">{p.title}</Heading>
                 <Text mt={4}>{p.textSnipped}</Text>
@@ -38,7 +36,11 @@ import React, { useState } from "react"
         ))}
         </Stack>
         <Flex justifyContent="center" marginTop="10" padding={10}>
-        <Button onClick={() => setVariables({limit:variables.limit,cursor:data!.posts[data!.posts.length -1].createdAt})} color="black" loadingText="Loading Posts" colorScheme="teal" variant="outline"> More Posts</Button>
+                        { !data || !data!.posts.hasMore ? null 
+                        :
+                        <Button isDisabled={fetching} type="button" onClick={() => setVariables({limit:variables.limit,cursor:data!.posts.Posts[data!.posts.Posts.length -1].createdAt})} color="black" loadingText="Loading Posts" colorScheme="teal" variant="outline"> More Posts</Button> 
+            }
+
         </Flex>
         </Layout>
     )

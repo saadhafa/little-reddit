@@ -1,9 +1,10 @@
 query Posts($limit:Int!, $cursor:String){
   posts(limit:$limit,cursor:$cursor){
     hasMore
-   Posts{ id
+   Posts{ 
+    id
     title
-    text
+    textSnipped
     createdAt
     updatedAt
   }

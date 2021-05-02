@@ -70,6 +70,12 @@ export type MutationLoginArgs = {
   usernameOrEmail: Scalars['String'];
 };
 
+export type PaginatedPosts = {
+  __typename?: 'PaginatedPosts';
+  Posts: Array<Posts>;
+  hasMore: Scalars['Boolean'];
+};
+
 export type PostInput = {
   title: Scalars['String'];
   text: Scalars['String'];
@@ -89,7 +95,7 @@ export type Posts = {
 
 export type Query = {
   __typename?: 'Query';
-  posts: Array<Posts>;
+  posts: PaginatedPosts;
   post?: Maybe<Posts>;
   hello: Scalars['String'];
   me?: Maybe<User>;
@@ -243,10 +249,14 @@ export type PostsQueryVariables = Exact<{
 
 export type PostsQuery = (
   { __typename?: 'Query' }
-  & { posts: Array<(
-    { __typename?: 'Posts' }
-    & Pick<Posts, 'id' | 'title' | 'textSnipped' | 'createdAt' | 'updatedAt'>
-  )> }
+  & { posts: (
+    { __typename?: 'PaginatedPosts' }
+    & Pick<PaginatedPosts, 'hasMore'>
+    & { Posts: Array<(
+      { __typename?: 'Posts' }
+      & Pick<Posts, 'id' | 'title' | 'textSnipped' | 'createdAt' | 'updatedAt'>
+    )> }
+  ) }
 );
 
 export const UserFragmentDoc = gql`
@@ -351,11 +361,14 @@ export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'q
 export const PostsDocument = gql`
     query Posts($limit: Int!, $cursor: String) {
   posts(limit: $limit, cursor: $cursor) {
-    id
-    title
-    textSnipped
-    createdAt
-    updatedAt
+    hasMore
+    Posts {
+      id
+      title
+      textSnipped
+      createdAt
+      updatedAt
+    }
   }
 }
     `;
