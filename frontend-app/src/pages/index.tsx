@@ -3,18 +3,26 @@ import Layout from "../components/layout"
 import NavBar from "../components/NavBar"
 import { usePostsQuery } from "../generated/graphql"
 import { CreateUrqlClient } from "../util/createUrqlClient"
-import {Stack,Box,Text,Heading} from '@chakra-ui/react'
+import {Stack,Box,Text,Heading, Button, Flex} from '@chakra-ui/react'
+import React, { useState } from "react"
 
 
  
  
  
  const Index = () => {
-     const [{data}] = usePostsQuery({
-         variables:{
-             limit:10 as never
-         }
+     const [variables,setVariables] = useState({limit:10, cursor:null as null | string })
+     const [{data,fetching}] = usePostsQuery({
+         variables,
      })
+     console.log(data)
+     console.log(variables)
+
+     if (!data && !fetching){
+         return <Heading>Not able to get data from the Server</Heading> 
+     }
+
+
     return (
         <Layout variant="regular">
         
@@ -29,6 +37,9 @@ import {Stack,Box,Text,Heading} from '@chakra-ui/react'
               </Box>
         ))}
         </Stack>
+        <Flex justifyContent="center" marginTop="10" padding={10}>
+        <Button onClick={() => setVariables({limit:variables.limit,cursor:data!.posts[data!.posts.length -1].createdAt})} color="black" loadingText="Loading Posts" colorScheme="teal" variant="outline"> More Posts</Button>
+        </Flex>
         </Layout>
     )
 
