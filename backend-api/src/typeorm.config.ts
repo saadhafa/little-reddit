@@ -1,6 +1,7 @@
 import { Posts } from "./entities/Posts";
 import { User } from './entities/User';
 import {ConnectionOptions} from 'typeorm'
+import path from 'path'
 
 export default {
     type:'postgres',
@@ -9,6 +10,7 @@ export default {
     password:'root',
     synchronize:true,
     logging:true,
-    entities:[User,Posts]
+    entities:[User,Posts],
+    migrations:[path.join(__dirname,"./migrations/*")]
 } as ConnectionOptions
 

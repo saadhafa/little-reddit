@@ -70,6 +70,12 @@ export type MutationLoginArgs = {
   usernameOrEmail: Scalars['String'];
 };
 
+export type PaginatedPosts = {
+  __typename?: 'PaginatedPosts';
+  Posts: Array<Posts>;
+  hasMore: Scalars['Boolean'];
+};
+
 export type PostInput = {
   title: Scalars['String'];
   text: Scalars['String'];
@@ -84,14 +90,21 @@ export type Posts = {
   text: Scalars['String'];
   creatorId: Scalars['Float'];
   points: Scalars['Float'];
+  textSnipped: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  posts: Array<Posts>;
+  posts: PaginatedPosts;
   post?: Maybe<Posts>;
   hello: Scalars['String'];
   me?: Maybe<User>;
+};
+
+
+export type QueryPostsArgs = {
+  cursor?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
 };
 
 
@@ -228,15 +241,22 @@ export type MeQuery = (
   )> }
 );
 
-export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
+export type PostsQueryVariables = Exact<{
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
 
 
 export type PostsQuery = (
   { __typename?: 'Query' }
-  & { posts: Array<(
-    { __typename?: 'Posts' }
-    & Pick<Posts, 'id' | 'title'>
-  )> }
+  & { posts: (
+    { __typename?: 'PaginatedPosts' }
+    & Pick<PaginatedPosts, 'hasMore'>
+    & { Posts: Array<(
+      { __typename?: 'Posts' }
+      & Pick<Posts, 'id' | 'title' | 'textSnipped' | 'createdAt' | 'updatedAt'>
+    )> }
+  ) }
 );
 
 export const UserFragmentDoc = gql`
@@ -339,10 +359,16 @@ export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'q
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
 export const PostsDocument = gql`
-    query Posts {
-  posts {
-    id
-    title
+    query Posts($limit: Int!, $cursor: String) {
+  posts(limit: $limit, cursor: $cursor) {
+    hasMore
+    Posts {
+      id
+      title
+      textSnipped
+      createdAt
+      updatedAt
+    }
   }
 }
     `;
