@@ -12,11 +12,12 @@ import {
   Root,
   UseMiddleware,
   ObjectType,
+  Args,
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/Auth";
 import { getConnection } from "typeorm";
-import { query } from "express";
+import { Updoot } from "../entities/Updoot";
 
 @InputType()
 class PostInput {
@@ -41,6 +42,30 @@ export class PostResolver {
   @FieldResolver(() => String)
   textSnipped(@Root() root: Posts) {
     return root.text.slice(0, 50);
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ) {
+    const { userId } = req.session;
+
+    const isUpdoot = value !== -1;
+    const realValue = isUpdoot ? 1 : -1;
+
+    await getConnection().query(
+      `
+      START TRANSACTION;
+      insert into updoot ("postId","userID",value) values(${postId},${userId},${realValue});
+      update posts set points = points + ${realValue} where id = ${postId};
+      COMMIT;
+    `
+    );
+
+    return true;
   }
 
   @Query(() => PaginatedPosts)
