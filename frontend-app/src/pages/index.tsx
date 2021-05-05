@@ -30,6 +30,7 @@ const Index = () => {
               <Box key={p.id} p={5} shadow="md" borderWidth="1px">
                 <Heading fontSize="xl">{p.title}</Heading>
                 <Text mt={4}>{p.textSnipped}</Text>
+                <Text>Created By : {p.creator.username}</Text>
               </Box>
             ))}
       </Stack>
