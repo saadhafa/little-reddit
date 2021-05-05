@@ -41,7 +41,7 @@ class UserResponse {
 export class UserResolver {
   @FieldResolver(() => String)
   email(@Root() user: User, @Ctx() { req }: MyContext) {
-    if (req.session.userId === user.id && req.session.userId !== undefined) {
+    if (req.session.userId === user.id) {
       return user.email;
     }
 

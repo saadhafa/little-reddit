@@ -8,6 +8,7 @@ import {
   BaseEntity,
   ManyToOne,
 } from "typeorm";
+import { Updoot } from "./Updoot";
 import { User } from "./User";
 
 @ObjectType()
@@ -44,4 +45,7 @@ export class Posts extends BaseEntity {
   @Field()
   @ManyToOne(() => User, (user) => user.posts)
   creator: User;
+
+  @ManyToOne(() => Updoot, (updoot) => updoot.posts)
+  updoots: Updoot[];
 }
