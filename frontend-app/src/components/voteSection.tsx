@@ -11,6 +11,7 @@ export interface IAppProps {
 const VoteSection: React.FC<IAppProps> = ({ points, postId }) => {
   const [, vote] = useVoteMutation();
   //   add loading after
+  const [] = set;
   return (
     <Flex direction="column" mr={5} justifyContent="center" alignItems="center">
       <IconButton
@@ -18,8 +19,8 @@ const VoteSection: React.FC<IAppProps> = ({ points, postId }) => {
         aria-label="voteUp"
         size="sm"
         icon={<ChevronUpIcon />}
-        onClick={() => {
-          vote({ value: 1, postId });
+        onClick={async () => {
+          await vote({ value: 1, postId });
         }}
       />
       {points}
@@ -29,8 +30,8 @@ const VoteSection: React.FC<IAppProps> = ({ points, postId }) => {
         aria-label="voteDown"
         size="sm"
         icon={<ChevronDownIcon />}
-        onClick={() => {
-          vote({ value: -1, postId });
+        onClick={async () => {
+          await vote({ value: -1, postId });
         }}
       />
     </Flex>
