@@ -7,6 +7,7 @@ query Posts($limit: Int!, $cursor: String) {
       textSnipped
       createdAt
       updatedAt
+      points
       creator {
         username
       }

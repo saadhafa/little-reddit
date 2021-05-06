@@ -3,8 +3,18 @@ import Layout from "../components/layout";
 import NavBar from "../components/NavBar";
 import { usePostsQuery } from "../generated/graphql";
 import { CreateUrqlClient } from "../util/createUrqlClient";
-import { Stack, Box, Text, Heading, Button, Flex } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import {
+  Stack,
+  Box,
+  Text,
+  Heading,
+  Button,
+  Flex,
+  IconButton,
+} from "@chakra-ui/react";
 import React, { useState } from "react";
+import VoteSection from "../components/voteSection";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -27,11 +37,14 @@ const Index = () => {
         {!data
           ? null
           : data.posts.Posts.map((p) => (
-              <Box key={p.id} p={5} shadow="md" borderWidth="1px">
-                <Heading fontSize="xl">{p.title}</Heading>
-                <Text mt={4}>{p.textSnipped}</Text>
-                <Text>Created By : {p.creator.username}</Text>
-              </Box>
+              <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+                <VoteSection points={p.points} postId={p.id} />
+                <Box>
+                  <Heading fontSize="xl">{p.title}</Heading>
+                  <Text mt={4}>{p.textSnipped}</Text>
+                  <Text>Created By : {p.creator.username}</Text>
+                </Box>
+              </Flex>
             ))}
       </Stack>
       <Flex justifyContent="center" marginTop="10" padding={10}>
