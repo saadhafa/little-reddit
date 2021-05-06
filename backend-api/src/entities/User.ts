@@ -1,36 +1,45 @@
-import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn, UpdateDateColumn,BaseEntity,OneToMany} from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+  OneToMany,
+  ManyToOne,
+} from "typeorm";
 import { Field, ObjectType } from "type-graphql";
-import {Posts} from './Posts'
+import { Posts } from "./Posts";
+import { Updoot } from "./Updoot";
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
-
   @Field()
   @PrimaryGeneratedColumn()
-  id!:number
+  id!: number;
 
-  @Field(()=> String)
+  @Field(() => String)
   @CreateDateColumn()
-  createdAt:Date
+  createdAt: Date;
 
-
-  @Field(()=> String)
+  @Field(() => String)
   @UpdateDateColumn()
-  updatedAt:Date
+  updatedAt: Date;
 
   @Field()
-  @Column({unique:true})
-  username!:string
+  @Column({ unique: true })
+  username!: string;
 
   @Field()
-  @Column({unique:true})
-  email!:string
-
+  @Column({ unique: true })
+  email!: string;
 
   @Column()
-  password!:string
+  password!: string;
 
-  @OneToMany(() => Posts, posts => posts.creator)
+  @OneToMany(() => Posts, (posts) => posts.creator)
   posts: Posts[];
 
+  @ManyToOne(() => Updoot, (updoot) => updoot.user)
+  updoots: Updoot[];
 }
