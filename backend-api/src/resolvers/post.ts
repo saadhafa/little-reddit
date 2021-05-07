@@ -12,12 +12,11 @@ import {
   Root,
   UseMiddleware,
   ObjectType,
-  Args,
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/Auth";
 import { getConnection } from "typeorm";
-import { Updoot } from "../entities/Updoot";
+import { Updoot } from "src/entities/Updoot";
 
 @InputType()
 class PostInput {
@@ -55,6 +54,18 @@ export class PostResolver {
 
     const isUpdoot = value !== -1;
     const realValue = isUpdoot ? 1 : -1;
+
+    const updoot = await Updoot.findOne({ where: { postId, userId } });
+
+    // already voted and wants to change vote
+    if (updoot && updoot.value !== realValue) {
+    } else if (!updoot) {
+      await getConnection().transaction(async (tm) => {
+        await tm.query(`
+          insert into updoot("postId","userID",value) values($1,$2,$3)
+        `);
+      });
+    }
 
     await getConnection().query(
       `
