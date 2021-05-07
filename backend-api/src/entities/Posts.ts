@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   BaseEntity,
   ManyToOne,
+  In,
 } from "typeorm";
 import { Updoot } from "./Updoot";
 import { User } from "./User";
@@ -21,6 +22,9 @@ export class Posts extends BaseEntity {
   @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field(() => Int, { nullable: true })
+  voteStatus: number | null;
 
   @Field(() => String)
   @UpdateDateColumn()

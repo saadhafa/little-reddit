@@ -51,8 +51,6 @@ export class PostResolver {
     @Ctx() { req }: MyContext
   ) {
     const { userId } = req.session;
-    console.log(userId);
-
     const isUpdoot = value !== -1;
     const realValue = isUpdoot ? 1 : -1;
 
@@ -60,12 +58,23 @@ export class PostResolver {
 
     // already voted and wants to change vote
     if (updoot && updoot.value !== realValue) {
+      console.log("i am in ", value);
       await getConnection().transaction(async (tm) => {
         await tm.query(
           `
-        update  updoot set value = $1 where "postId" = $2 and "userID" = $3
+        update  updoot set value = $1 where "postId" = $2 and "userID" = $3;
+
         `,
           [value, postId, userId]
+        );
+
+        await tm.query(
+          `
+          update posts
+          set points = points + $1
+          where id = $2
+        `,
+          [2 * realValue, postId]
         );
       });
     } else if (!updoot) {
@@ -85,11 +94,12 @@ export class PostResolver {
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
+    @Ctx() { req }: MyContext
   ): Promise<PaginatedPosts> {
     const maxLimit = Math.min(50, limit) + 1;
 
-    const queryArgs: any[] = [maxLimit];
+    const queryArgs: any[] = [maxLimit, req.session.userId];
 
     if (cursor) {
       queryArgs.push(new Date(parseInt(cursor)));
@@ -100,10 +110,15 @@ export class PostResolver {
         select p.*,json_build_object(
           'username',u.username,
           'email',u.email
-          ) creator 
+          ) creator,
+          ${
+            req.session.userId
+              ? '(select value from updoot where "userID" = $2 and "postId" = p.id)  "voteStatus"'
+              : '$2 as "voteStatus"'
+          }
           from posts p
         inner join public.user u on u.id = p."creatorId"
-        ${cursor ? `where p."createdAt" < $2 ` : ""} 
+        ${cursor ? `where p."createdAt" < $3 ` : ""} 
         order by p."createdAt" DESC
         limit $1
      `,
