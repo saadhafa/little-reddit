@@ -16,7 +16,7 @@ import {
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/Auth";
 import { getConnection } from "typeorm";
-import { Updoot } from "src/entities/Updoot";
+import { Updoot } from "../entities/Updoot";
 
 @InputType()
 class PostInput {
@@ -51,30 +51,33 @@ export class PostResolver {
     @Ctx() { req }: MyContext
   ) {
     const { userId } = req.session;
+    console.log(userId);
 
     const isUpdoot = value !== -1;
     const realValue = isUpdoot ? 1 : -1;
 
-    const updoot = await Updoot.findOne({ where: { postId, userId } });
+    const updoot = await Updoot.findOne({ where: { postId, userID: userId } });
 
     // already voted and wants to change vote
     if (updoot && updoot.value !== realValue) {
+      await getConnection().transaction(async (tm) => {
+        await tm.query(
+          `
+        update  updoot set value = $1 where "postId" = $2 and "userID" = $3
+        `,
+          [value, postId, userId]
+        );
+      });
     } else if (!updoot) {
       await getConnection().transaction(async (tm) => {
         await tm.query(`
-          insert into updoot("postId","userID",value) values($1,$2,$3)
+        insert into updoot ("postId","userID",value) values(${postId},${userId},${realValue});
         `);
+
+        await tm.query(`
+        update posts set points = points + ${realValue} where id = ${postId};`);
       });
     }
-
-    await getConnection().query(
-      `
-      START TRANSACTION;
-      insert into updoot ("postId","userID",value) values(${postId},${userId},${realValue});
-      update posts set points = points + ${realValue} where id = ${postId};
-      COMMIT;
-    `
-    );
 
     return true;
   }

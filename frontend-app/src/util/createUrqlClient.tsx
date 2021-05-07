@@ -1,4 +1,5 @@
-import { createClient, dedupExchange, fetchExchange } from "urql";
+import { dedupExchange, fetchExchange } from "urql";
+import { gql } from "@urql/core";
 import {
   LogoutMutation,
   MeQuery,
@@ -101,6 +102,32 @@ export const CreateUrqlClient = (ssrExchange: any) => ({
       },
       updates: {
         Mutation: {
+          vote: (_result, args, cache, info) => {
+            const { postId, value } = args;
+            const data = cache.readFragment(
+              gql`
+                fragment _ on Posts {
+                  id
+                  points
+                }
+              `,
+              { id: postId }
+            );
+            console.log(data);
+
+            if (data) {
+              const newData = data.points + value;
+              cache.writeFragment(
+                gql`
+                  fragment _ on Posts {
+                    id
+                    points
+                  }
+                `,
+                { id: postId, points: newData }
+              );
+            }
+          },
           createPost: (_result, args, cache, info) => {
             const allFields = cache.inspectFields("Query");
             const fieldInfos = allFields.filter(

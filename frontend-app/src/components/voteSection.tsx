@@ -11,7 +11,6 @@ export interface IAppProps {
 const VoteSection: React.FC<IAppProps> = ({ points, postId }) => {
   const [, vote] = useVoteMutation();
   //   add loading after
-  const [] = set;
   return (
     <Flex direction="column" mr={5} justifyContent="center" alignItems="center">
       <IconButton
