@@ -1,9 +1,7 @@
 import { withUrqlClient } from "next-urql";
 import Layout from "../components/layout";
-import NavBar from "../components/NavBar";
 import { usePostsQuery } from "../generated/graphql";
 import { CreateUrqlClient } from "../util/createUrqlClient";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
   Stack,
   Box,
@@ -11,10 +9,11 @@ import {
   Heading,
   Button,
   Flex,
-  IconButton,
+  Link,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import VoteSection from "../components/voteSection";
+import NextLink from "next/link";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -40,7 +39,11 @@ const Index = () => {
               <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
                 <VoteSection points={p.points} postId={p.id} />
                 <Box>
-                  <Heading fontSize="xl">{p.title}</Heading>
+                  <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                    <Link>
+                      <Heading fontSize="xl">{p.title}</Heading>
+                    </Link>
+                  </NextLink>
                   <Text mt={4}>{p.textSnipped}</Text>
                   <Text>Created By : {p.creator.username}</Text>
                 </Box>

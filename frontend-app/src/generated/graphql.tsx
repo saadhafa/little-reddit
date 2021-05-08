@@ -92,6 +92,7 @@ export type Posts = {
   __typename?: 'Posts';
   id: Scalars['Float'];
   createdAt: Scalars['String'];
+  voteStatus?: Maybe<Scalars['Int']>;
   updatedAt: Scalars['String'];
   title: Scalars['String'];
   text: Scalars['String'];
@@ -117,7 +118,7 @@ export type QueryPostsArgs = {
 
 
 export type QueryPostArgs = {
-  id: Scalars['Float'];
+  id: Scalars['Int'];
 };
 
 export type User = {
@@ -260,6 +261,23 @@ export type MeQuery = (
   )> }
 );
 
+export type PostQueryVariables = Exact<{
+  postId: Scalars['Int'];
+}>;
+
+
+export type PostQuery = (
+  { __typename?: 'Query' }
+  & { post?: Maybe<(
+    { __typename?: 'Posts' }
+    & Pick<Posts, 'id' | 'title' | 'text'>
+    & { creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'username'>
+    ) }
+  )> }
+);
+
 export type PostsQueryVariables = Exact<{
   limit: Scalars['Int'];
   cursor?: Maybe<Scalars['String']>;
@@ -273,7 +291,7 @@ export type PostsQuery = (
     & Pick<PaginatedPosts, 'hasMore'>
     & { Posts: Array<(
       { __typename?: 'Posts' }
-      & Pick<Posts, 'id' | 'title' | 'textSnipped' | 'createdAt' | 'updatedAt' | 'points'>
+      & Pick<Posts, 'id' | 'title' | 'textSnipped' | 'createdAt' | 'updatedAt' | 'points' | 'voteStatus'>
       & { creator: (
         { __typename?: 'User' }
         & Pick<User, 'username'>
@@ -390,6 +408,22 @@ export const MeDocument = gql`
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
+export const PostDocument = gql`
+    query Post($postId: Int!) {
+  post(id: $postId) {
+    id
+    title
+    text
+    creator {
+      username
+    }
+  }
+}
+    `;
+
+export function usePostQuery(options: Omit<Urql.UseQueryArgs<PostQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PostQuery>({ query: PostDocument, ...options });
+};
 export const PostsDocument = gql`
     query Posts($limit: Int!, $cursor: String) {
   posts(limit: $limit, cursor: $cursor) {
@@ -401,6 +435,7 @@ export const PostsDocument = gql`
       createdAt
       updatedAt
       points
+      voteStatus
       creator {
         username
       }
