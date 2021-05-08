@@ -15,7 +15,7 @@ import {
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/Auth";
-import { getConnection } from "typeorm";
+import { getConnection, In } from "typeorm";
 import { Updoot } from "../entities/Updoot";
 
 @InputType()
@@ -132,8 +132,8 @@ export class PostResolver {
   }
 
   @Query(() => Posts, { nullable: true })
-  post(@Arg("id") id: number): Promise<Posts | undefined> {
-    return Posts.findOne(id);
+  post(@Arg("id", () => Int) id: number): Promise<Posts | undefined> {
+    return Posts.findOne(id, { relations: ["creator"] });
   }
 
   @Mutation(() => Posts)
