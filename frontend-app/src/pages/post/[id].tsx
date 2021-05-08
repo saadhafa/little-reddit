@@ -1,7 +1,8 @@
 import { Box, Heading, Text } from "@chakra-ui/layout";
+import { Flex } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import { FC } from "react";
+import React, { FC } from "react";
 import Layout from "../../components/layout";
 import { usePostQuery, usePostsQuery } from "../../generated/graphql";
 import { CreateUrqlClient } from "../../util/createUrqlClient";
@@ -23,6 +24,17 @@ const Post: FC<PostProps> = ({}) => {
     return (
       <Layout>
         <Heading>Loading data ... </Heading>
+      </Layout>
+    );
+  }
+
+  if (!data?.post) {
+    return (
+      <Layout variant="regular">
+        <Flex flexDirection="column">
+          <Heading mb="4">Opps Page not Found 404 :{`(`}</Heading>
+          <Text>The page you requeted does not exist At that moment</Text>
+        </Flex>
       </Layout>
     );
   }
