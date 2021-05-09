@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "@chakra-ui/layout";
+import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { Link } from "@chakra-ui/react";
 import React from "react";
 
@@ -59,9 +59,23 @@ const NavBar: React.FC = () => {
       zIndex={3}
       top="0"
       bg="tomato"
-      justifyContent="flex-end"
+      justifyContent="center"
     >
-      <Box p={4}>{body}</Box>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        width="900px"
+        p={4}
+      >
+        <Box>
+          <NextLink href="/">
+            <Heading color="white">
+              <Link>LittleReddit</Link>
+            </Heading>
+          </NextLink>
+        </Box>
+        <Box>{body}</Box>
+      </Flex>
     </Flex>
   );
 };
