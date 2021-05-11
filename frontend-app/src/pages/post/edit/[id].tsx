@@ -16,7 +16,7 @@ import { CreateUrqlClient } from "../../../util/createUrqlClient";
 interface EditPostProps {}
 
 const EditPost: FC<EditPostProps> = ({}) => {
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const postId = typeof query.id === "string" ? parseInt(query.id) : -1;
   const [{ data, fetching }] = usePostQuery({
     pause: postId === -1,
@@ -53,6 +53,7 @@ const EditPost: FC<EditPostProps> = ({}) => {
             title: values.title as string,
             text: values.text as string,
           });
+          push("/");
         }}
       >
         {({}) => (
