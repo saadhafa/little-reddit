@@ -150,19 +150,23 @@ export class PostResolver {
 
   @Mutation(() => Posts, { nullable: true })
   async updatePost(
-    @Arg("id") id: number,
-    @Arg("title", () => String) title: string
+    @Arg("id", () => Int) id: number,
+    @Arg("title") title: string,
+    @Arg("text") text: string,
+    @Ctx() { req }: MyContext
   ): Promise<Posts | null> {
-    const post = await Posts.findOne(id);
-    if (!post) {
-      return null;
-    }
+    const post = await getConnection()
+      .createQueryBuilder()
+      .update(Posts)
+      .set({ title, text })
+      .where(`id = :id and "creatorId" = :userId `, {
+        id,
+        userId: req.session.userId,
+      })
+      .returning("*")
+      .execute();
 
-    if (typeof title !== "undefined") {
-      await Posts.update({ id }, { title });
-    }
-
-    return post;
+    return post.raw[0];
   }
 
   @Mutation(() => Boolean)
@@ -171,7 +175,17 @@ export class PostResolver {
     @Arg("id", () => Int) id: number,
     @Ctx() { req }: MyContext
   ): Promise<Boolean> {
-    await Posts.delete({ id, creatorId: req.session.userId });
+    const post = await Posts.findOne({ id });
+    if (!post) {
+      return false;
+    }
+
+    if (post.creatorId !== req.session.userId) {
+      throw new Error("not authenticated");
+    }
+
+    await Updoot.delete({ postId: id });
+    await Posts.delete({ id });
     return true;
   }
 }

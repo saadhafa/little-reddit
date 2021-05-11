@@ -23,7 +23,7 @@ const VoteSection: React.FC<IAppProps> = ({ points, postId }) => {
           await vote({ value: 1, postId });
         }}
       />
-      {points}
+      {points === -1 ? 0 : points}
       <IconButton
         colorScheme="red"
         aria-label="voteDown"

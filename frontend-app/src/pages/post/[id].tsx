@@ -54,4 +54,4 @@ const Post: FC<PostProps> = ({}) => {
   );
 };
 
-export default withUrqlClient(CreateUrqlClient, { ssr: true })(Post);
+export default withUrqlClient(CreateUrqlClient)(Post);
