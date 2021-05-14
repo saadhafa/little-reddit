@@ -15,7 +15,7 @@ import {
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/Auth";
-import { getConnection, In } from "typeorm";
+import { getConnection } from "typeorm";
 import { Updoot } from "../entities/Updoot";
 
 @InputType()

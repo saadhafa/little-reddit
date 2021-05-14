@@ -3,12 +3,11 @@ import { User } from "./entities/User";
 import { ConnectionOptions } from "typeorm";
 import path from "path";
 import { Updoot } from "./entities/Updoot";
+import "dotenv-safe/config";
 
 export default {
   type: "postgres",
-  database: "reddit2",
-  username: "mac",
-  password: "root",
+  url: process.env.DATABASE_URL,
   synchronize: true,
   logging: true,
   entities: [User, Posts, Updoot],
