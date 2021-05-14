@@ -20,27 +20,27 @@ Little reddit is an app inspired by reddit that allows you to create, vote, edit
 
 ### Home index
 
-![]()
+![](https://github.com/saadhafa/little-reddit/blob/master/Images/pic-demo-1.png)
 
 ### Create Post
 
-![]()
+![](https://github.com/saadhafa/little-reddit/blob/master/Images/pic-demo-2.png)
 
 ### Forgot Password
 
-![]()
+![](https://github.com/saadhafa/little-reddit/blob/master/Images/pic-demo-3.png)
 
 ### Email to reset password
 
-![]()
+![](https://github.com/saadhafa/little-reddit/blob/master/Images/pic-demo-4.png)
 
 ### New password
 
-![]()
+![](https://github.com/saadhafa/little-reddit/blob/master/Images/pic-demo-5.png)
 
 - The reset password link can expire after an hour or if used
 
-![]()
+![](https://github.com/saadhafa/little-reddit/blob/master/Images/pic-demo-6.png)
 
 ## Authors
 
