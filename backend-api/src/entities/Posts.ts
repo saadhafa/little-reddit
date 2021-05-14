@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   BaseEntity,
   ManyToOne,
-  In,
 } from "typeorm";
 import { Updoot } from "./Updoot";
 import { User } from "./User";
